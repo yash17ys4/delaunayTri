@@ -33,8 +33,6 @@ int main() {
 		pcl::PointXYZ p(x, y, z);
 		cloud->push_back(p);
 	}
-	// std::map<int, std::set <int>> mesh;
-	// std::set<std::tuple<int, int, int>> mesh;
 	std::set<std::set<int>> mesh;
 	pcl::SampleConsensusModelCircle3D<pcl::PointXYZ> pseg(cloud);
 	pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
@@ -80,21 +78,6 @@ int main() {
 					A.insert(indx[n]);
 					mesh.insert(A);
 				}
-				// if(nnn == 0) {
-					// mesh[i].insert(indx[m]);
-					// mesh[i].insert(indx[n]);
-					// mesh[m].insert(i);
-					// mesh[m].insert(indx[n]);
-					// mesh[n].insert(indx[m]);
-					// mesh[n].insert(i);
-					// std::tuple<int, int, int> A = {i, indx[m], indx[n]};
-					// std::set<int> A;
-					// A.insert(i);
-					// A.insert(indx[m]);
-					// A.insert(indx[n]);
-					// mesh.insert(A);
-				// } 
-
 			}
 		}
 	}
@@ -103,12 +86,6 @@ int main() {
 			std::cout<<p<<", ";
 		}
 		std::cout<<"\n";
-		// std::cout<<std::get<0>(adj)<<", "<<std::get<1>(adj)<<", "<<std::get<2>(adj)<<std::endl;
-		// std::cout<<"for "<<adj.first<<": ";
-		// for(auto neighbr : adj.second) {
-		// 	std::cout<<neighbr<<", ";
-		// }
-		// std::cout<<std::endl;
 	}
 	return 0;
 }
