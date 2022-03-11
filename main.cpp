@@ -103,15 +103,10 @@ std::set<std::pair<int, int>> myAlgo(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud,
 	for(int i = 0; i < (int)cloud_with_normals->size(); i++) {
 		indx.clear(); id2.clear();
 		sqDist.clear(); sq2.clear();
-		kdtree.radiusSearch(cloud_with_normals->at(i), R, indx, sqDist);
-		for(int m = 0; m < indx.size(); m++) {
-			if(pcl::euclideanDistance(cloud_with_normals->at(i), cloud_with_normals->at(indx[m])) <= 1e-2) {
-				continue;
-			}
-			for(int n = 0; n < m; n++) {
-				if(pcl::euclideanDistance(cloud_with_normals->at(i), cloud_with_normals->at(indx[n])) <= 1e-2) {
-					continue;
-				}
+		// kdtree.radiusSearch(cloud_with_normals->at(i), R, indx, sqDist);
+		kdtree.nearestKSearch(cloud_with_normals->at(i), 10, indx, sqDist);
+		for(int m = 1; m < indx.size(); m++) {
+			for(int n = 1; n < m; n++) {
 				std::vector <int> indices = {i, indx[m], indx[n]};
 				Eigen::VectorXf modelCoeffs;
 				pseg.computeModelCoefficients(indices, modelCoeffs);
@@ -121,7 +116,7 @@ std::set<std::pair<int, int>> myAlgo(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud,
 				pcl::PointNormal center(modelCoeffs[0], modelCoeffs[1], modelCoeffs[2], modelCoeffs[4], modelCoeffs[5], modelCoeffs[6]);
 				//Set of pts within radius from circumcenter
 				std::set<int> indx_set;
-				auto nnn = kdtree.radiusSearch(center, modelCoeffs[3]-R/100, id2, sq2);
+				auto nnn = kdtree.radiusSearch(center, modelCoeffs[3], id2, sq2);
 				for(auto ix : id2) {
 					indx_set.insert(ix);
 				}
@@ -129,14 +124,7 @@ std::set<std::pair<int, int>> myAlgo(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud,
 				indx_set.erase(indx[m]);
 				indx_set.erase(indx[n]);
 
-				// Checking angle between local normal and planes normal
-				Eigen::Vector3f faceNormal(modelCoeffs[4], modelCoeffs[5], modelCoeffs[6]);
-				Eigen::Vector3f localNormal(cloud_with_normals->at(i).getNormalVector3fMap());
-				faceNormal.normalize();
-				localNormal.normalize();
-				double cosine = faceNormal.dot(localNormal);
-
-				if(indx_set.empty() && !(std::abs(cosine) < std::cos(M_PI/36))) {
+				if(indx_set.empty()) {
 					edges.insert({ i, indx[m] });
 					edges.insert({ indx[m], indx[n] });
 					edges.insert({ indx[n], i });
@@ -152,6 +140,10 @@ int main() {
 	double R;
 	std::cout<<"Enter radius to search R:\n";
 	std::cin>>R;
+
+	// int K;
+	// std::cout<<"Enter number of neighbors to search\n";
+	// std::cin>>K;
 	
 	//filename
 	std::string filename;
