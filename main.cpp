@@ -103,8 +103,8 @@ std::set<std::pair<int, int>> myAlgo(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud,
 	for(int i = 0; i < (int)cloud_with_normals->size(); i++) {
 		indx.clear(); id2.clear();
 		sqDist.clear(); sq2.clear();
-		// kdtree.radiusSearch(cloud_with_normals->at(i), R, indx, sqDist);
-		kdtree.nearestKSearch(cloud_with_normals->at(i), 10, indx, sqDist);
+		kdtree.radiusSearch(cloud_with_normals->at(i), R, indx, sqDist);
+		// kdtree.nearestKSearch(cloud_with_normals->at(i), 10, indx, sqDist);
 		for(int m = 1; m < indx.size(); m++) {
 			for(int n = 1; n < m; n++) {
 				std::vector <int> indices = {i, indx[m], indx[n]};
